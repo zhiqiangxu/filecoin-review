@@ -11,7 +11,7 @@ In a nutshell the process is splitted into 4 phases:
     3. `tree_c_root` and `tree_r_last_root` are further hashed into `comm_r`.
 3. [`seal_commit_phase1`](https://github.com/filecoin-project/rust-filecoin-proofs-api/blob/fba94e039c140698fef692ba5399c925b9b31acf/src/seal.rs#L508)(C1)
     1. The idea is that, in order to prove that the miner actually stored the sector data, the miner has to come up with the merkle proofs of randomly challenged leaves of the above mentioned trees.
-    2. The challenge is divided into some specific number of partitions, the actual number is [decided](https://github.com/filecoin-project/rust-filecoin-proofs-api/blob/fba94e039c140698fef692ba5399c925b9b31acf/src/registry.rs#L122) by the sector size.
+    2. The challenge is divided into some specific number of partitions(basically some hardcoded rounds of challenges, where each round challenges several nodes from various trees above), the actual number is [decided](https://github.com/filecoin-project/rust-filecoin-proofs-api/blob/fba94e039c140698fef692ba5399c925b9b31acf/src/registry.rs#L122) by the sector size.
     3. A single partition proof shows that:
         1. The prover knows valid merkle paths for the challenged leaves in `tree_d` that is consistent with `comm_d`.
         2. The prover knows valid merkle paths for the challenged leaves in `tree_c` and `tree_r_last` which are consistent with `comm_r`.
