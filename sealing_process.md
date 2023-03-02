@@ -1,11 +1,11 @@
 # Sealing Process
 
 In a nutshell the process is splitted into 4 phases:
-1. [`seal_pre_commit_phase1`](https://github.com/filecoin-project/rust-filecoin-proofs-api/blob/fba94e039c140698fef692ba5399c925b9b31acf/src/seal.rs#L334)(P1)
+1. [`seal_pre_commit_phase1`](https://github.com/filecoin-project/rust-filecoin-proofs-api/blob/fba94e039c140698fef692ba5399c925b9b31acf/src/seal.rs#L334)(PC1)
     1. The sector data is stored as leaves of a merkle tree, resulting in the merkle tree `tree_d` and the merkle root `comm_d`.
     2. The miner derives a unique `replica_id` for the current sealing sector.
     3. A layered structure called `StackedDrg` that has the same number of nodes in each layer as `#leaves` of `tree_d`, is labeled based on `replica_id`, resulting in layered `labels`.
-2. [`seal_pre_commit_phase2`](https://github.com/filecoin-project/rust-filecoin-proofs-api/blob/fba94e039c140698fef692ba5399c925b9b31acf/src/seal.rs#L416)(P2)
+2. [`seal_pre_commit_phase2`](https://github.com/filecoin-project/rust-filecoin-proofs-api/blob/fba94e039c140698fef692ba5399c925b9b31acf/src/seal.rs#L416)(PC2)
     1. The layered `labels` are first aggregated into column commitments, then the column commitments are stored as leaves of a merkle tree, resulting in the merkle tree `tree_c` and the merkle root `tree_c_root`.
     2. The labels of the last layer are used as the keys for encoding the leaves of `tree_d`, the encoding results are stored as leaves of a merkle tree, resulting in the merkle tree `tree_r_last` and the merkle root `tree_r_last_root`.
     3. `tree_c_root` and `tree_r_last_root` are further hashed into `comm_r`.
@@ -24,9 +24,9 @@ In a nutshell the process is splitted into 4 phases:
 
 The details of each phase are explained below.
 
-## P1
+## PC1
 
-The purpose of this phase is to generate `tree_d` and `labals` mentioned above.
+The purpose of this phase is to generate `tree_d` and `labels` mentioned above.
 
 `tree_d` is generated as follows:
 1. The sector data is stored as [leaves](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/filecoin-proofs/src/api/seal.rs#L92) of the merkle tree, [padding](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/filecoin-proofs/src/api/seal.rs#L107) if needed.
@@ -60,7 +60,7 @@ The purpose of this phase is to generate `tree_d` and `labals` mentioned above.
 
 
 
-## P2
+## PC2
 
 The purpose of this phase is to generate `tree_c` and `tree_r_last` mentioned above.
 
@@ -80,7 +80,7 @@ The purpose of this phase is to generate `tree_c` and `tree_r_last` mentioned ab
 
 The roots of `tree_c` and `tree_r_last` are then [hashed](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/vanilla/proof.rs#L1437) into `comm_r`.
 
-## P3
+## C1
 
 The purpose of this phase is to generate proofs for all challenges.
 
@@ -97,7 +97,7 @@ The process is as follows:
         1. The parent labels are challenged node `c` are fetched and [repeated](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/vanilla/proof.rs#L248) as `LabelingProof`.
         2. The `LabelingProof` of the last layer is redundantly saved as `EncodingProof`.
 
-## P4
+## C2
 
 The purpose of this phase is to make the above proofs succinct using zkSNARK circuit(groth16 circuit actually).
 
