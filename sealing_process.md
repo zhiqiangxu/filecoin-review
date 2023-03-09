@@ -121,7 +121,7 @@ The process is as follows:
 
 The process of converting general computation to circuit is called arithmetization, which is pretty complicated in the general case (e.g. zkevm), but much easier for a specific computation, like sealing, and it's more relevant for developers actually writing circuits, so it's worth to dive into the details of [`StackedCircuit::synthesize`](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/circuit/proof.rs#L92):
 1. A witness for `replica_id` is allocated, which is then constrained to be equal to a input.
-2. Then the `replica_id` witness is [converted](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/circuit/proof.rs#L114) to bit witness of size `Scalar::NUM_BITS`(required by [`sha256 circuit`](https://github.com/filecoin-project/bellperson/blob/950829bba6504a806958877451480ef597d6bd73/src/gadgets/sha256.rs#L50)).
+2. Then the `replica_id` witness is [converted](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/circuit/proof.rs#L114) to bit witness of size `Scalar::NUM_BITS`(required by [`sha256 circuit`](https://github.com/filecoin-project/bellperson/blob/950829bba6504a806958877451480ef597d6bd73/src/gadgets/sha256.rs#L50), [here](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.180-4.pdf) for specification).
 3. A witness for `comm_d` is allocated and assigned, which is then constrained to be equal to a input.
 4. A witness for `comm_r` is allocated and assigned, which is then constrained to be equal to a input.
 5. A witness for `comm_r_last` is allocated and assigned.
