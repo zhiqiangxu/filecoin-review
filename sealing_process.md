@@ -26,10 +26,10 @@ The details of each phase are explained below.
 
 ## PC1
 
-The purpose of this phase is to generate `tree_d` and `labels` mentioned above.
+The purpose of this phase is to generate `tree_d` and `labels` mentioned above, and a sealed sector file `replica` which is further updated during PC2.
 
 `tree_d` is generated as follows:
-1. The sector data is stored as [leaves](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/filecoin-proofs/src/api/seal.rs#L92) of the merkle tree, [padding](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/filecoin-proofs/src/api/seal.rs#L107) if needed.
+1. The sector data file is first [copied as sealed sector file](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/filecoin-proofs/src/api/seal.rs#L92), [padding](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/filecoin-proofs/src/api/seal.rs#L107) if needed.
 2. Then a binary merkle tree is [created](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/filecoin-proofs/src/api/seal.rs#L153) based on leaves.
     1. Some notations: `tree_size` = `#leaf` + `#internal_node`.
     2. Then `#leaf` = `sector_size`/`size_of(domain)`, as per [here](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/filecoin-proofs/src/api/util.rs#L31).
@@ -62,7 +62,7 @@ The purpose of this phase is to generate `tree_d` and `labels` mentioned above.
 
 ## PC2
 
-The purpose of this phase is to generate `tree_c` and `tree_r_last` mentioned above.
+The purpose of this phase is to generate `tree_c` and `tree_r_last` mentioned above, and update the sealed sector file `replica` with preimages of leaves of `tree_r_last`.
 
 
 `tree_c` is generated as follows:
@@ -76,7 +76,7 @@ The purpose of this phase is to generate `tree_c` and `tree_r_last` mentioned ab
 
 `tree_r_last` is generated as follows:
 1. `labels` of the last layer are [used as encoding keys](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/vanilla/proof.rs#L1413) for the replica.
-2. Then `tree_r_last` is generated in a similar fasion as `tree_c` except that each element is computed by [combining](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/vanilla/proof.rs#L897) corresponding elements of sector data and label data of the last layer.
+2. Then `tree_r_last` is generated in a similar fasion as `tree_c` except that each element is computed by [combining](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/vanilla/proof.rs#L897) corresponding elements of sector data and label data of the last layer, the preimages of leaves are [stored in-place](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/vanilla/proof.rs#L899) in the sealed sector file `replica`.
 
 The roots of `tree_c` and `tree_r_last` are then [hashed](https://github.com/filecoin-project/rust-fil-proofs/blob/1680ad08f607512e0c2f9d13c330d07f2b2ca081/storage-proofs-porep/src/stacked/vanilla/proof.rs#L1437) into `comm_r`.
 
