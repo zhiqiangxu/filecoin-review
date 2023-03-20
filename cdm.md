@@ -102,7 +102,7 @@ This proposal is essentially about changing the calculation of `qa_pow` above.
 
 ## Specification
 
-1. A strict superset of [FIP56](https://github.com/filecoin-project/FIPs/blob/master/FIPS/fip-0056.md).
+1. A strict superset of [FIP56](https://github.com/filecoin-project/FIPs/blob/e80e4277a7592e1ce2b9f57a8e5d069251e97372/FIPS/fip-0056.md).
     1. SDM
         1. code:
             ```
