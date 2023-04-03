@@ -45,3 +45,13 @@ Let's dive into the details of `EamActor.CreateExternal` and `EvmContractActor.I
         2. There's no dedicated gas calculation for evm opcodes, as the entire wasm code has already been [metered](https://github.com/zhiqiangxu/filecoin-review/blob/main/fvm.md#advanced).
     3. If succesful, state is [persisted](https://github.com/filecoin-project/builtin-actors/blob/424669ba4e38a1a8557626d411cd0c89389f4fcd/actors/evm/src/lib.rs#L179).
 
+## Call builtin actor
+
+Suppose we want to call the [`account::AuthenticateMessageExported`](https://github.com/filecoin-project/builtin-actors/blob/e701cdbdfe81663d576a92ad52ae27b92e662e48/actors/account/src/lib.rs#L115), here's the call path:
+- `AccountAPI::authenticateMessageauthenticateMessage(target, params)`, [link](https://github.com/Zondax/filecoin-solidity/blob/d07293f079f502a5270edd002f15b470120b23f6/contracts/v0.8/AccountAPI.sol#L39)
+    - `Actor.callNonSingletonByID(target, AccountTypes.AuthenticateMessageMethodNum, Misc.CBOR_CODEC, raw_request, 0, true)`, [link](https://github.com/Zondax/filecoin-solidity/blob/d07293f079f502a5270edd002f15b470120b23f6/contracts/v0.8/utils/Actor.sol#L153)
+        - `Actor.callByID(target, method_num, codec, raw_request, value, static_call)`, [link](https://github.com/Zondax/filecoin-solidity/blob/d07293f079f502a5270edd002f15b470120b23f6/contracts/v0.8/utils/Actor.sol#L110)
+            - `address(CALL_ACTOR_ID).delegatecall(abi.encode(uint64(method_num), value, static_call ? READ_ONLY_FLAG : DEFAULT_FLAG, codec, raw_request, target))`, [link](https://github.com/filecoin-project/builtin-actors/blob/e701cdbdfe81663d576a92ad52ae27b92e662e48/actors/evm/src/interpreter/precompiles/fvm.rs#L114)
+                - `system.send_raw(&address, method, params, TokenAmount::from(&value), Some(ctx.gas_limit), flags)`, [link](https://github.com/filecoin-project/builtin-actors/blob/e701cdbdfe81663d576a92ad52ae27b92e662e48/actors/evm/src/interpreter/precompiles/fvm.rs#L179)
+                    - `account::AuthenticateMessageExported`, [link](https://github.com/filecoin-project/builtin-actors/blob/e701cdbdfe81663d576a92ad52ae27b92e662e48/actors/account/src/lib.rs#L115)
+                
